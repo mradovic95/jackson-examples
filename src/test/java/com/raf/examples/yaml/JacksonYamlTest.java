@@ -15,6 +15,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -85,13 +86,15 @@ public class JacksonYamlTest {
     }
 
     @Test
-    public void testPojoSerializationToFile() throws IOException {
+    public void testPojoSerializationToFile() throws IOException, URISyntaxException {
         //GIVEN
         Product product = new Product("product title", "product description", BigDecimal.TEN);
+        File file = new File(getClass().getClassLoader().getResource("testPojoSerializationToFile.yaml").toURI());
         //WHEN
-        objectMapper.writeValue(new File("testPojoSerializationToFile.yaml"), product);
+        objectMapper.writeValue(file, product);
         //THEN
-        String fileContent = new String(Files.readAllBytes(Paths.get("testPojoSerializationToFile.yaml")));
+        String fileContent = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
+                .getResource("testPojoSerializationToFile.yaml").getPath())));
         assertEquals("---\n" +
                         "title: \"product title\"\n" +
                         "description: \"product description\"\n" +
@@ -100,9 +103,9 @@ public class JacksonYamlTest {
     }
 
     @Test
-    public void testLoadPojoFromFile() throws IOException {
+    public void testLoadPojoFromFile() throws IOException, URISyntaxException {
         //GIVEN
-        File file = new File("testLoadPojoFromFile.yaml");
+        File file = new File(getClass().getClassLoader().getResource("testLoadPojoFromFile.yaml").toURI());
         //WHEN
         Product product = objectMapper.readValue(file, Product.class);
         //THEN

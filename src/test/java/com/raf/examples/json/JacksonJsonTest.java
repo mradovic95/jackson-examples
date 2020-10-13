@@ -14,6 +14,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -73,21 +74,23 @@ public class JacksonJsonTest {
     }
 
     @Test
-    public void testPojoSerializationToFile() throws IOException {
+    public void testPojoSerializationToFile() throws IOException, URISyntaxException {
         //GIVEN
         Product product = new Product("product title", "product description", BigDecimal.TEN);
+        File file = new File(getClass().getClassLoader().getResource("testPojoSerializationToFile.json").toURI());
         //WHEN
-        objectMapper.writeValue(new File("testPojoSerializationToFile.json"), product);
+        objectMapper.writeValue(file, product);
         //THEN
-        String fileContent = new String(Files.readAllBytes(Paths.get("testPojoSerializationToFile.json")));
+        String fileContent = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
+                .getResource("testPojoSerializationToFile.json").getPath())));
         assertEquals("{\"title\":\"product title\",\"description\":\"product description\",\"price\":10}",
                 fileContent);
     }
 
     @Test
-    public void testLoadPojoFromFile() throws IOException {
+    public void testLoadPojoFromFile() throws IOException, URISyntaxException {
         //GIVEN
-        File file = new File("testLoadPojoFromFile.json");
+        File file = new File(getClass().getClassLoader().getResource("testLoadPojoFromFile.json").toURI());
         //WHEN
         Product product = objectMapper.readValue(file, Product.class);
         //THEN
