@@ -2,6 +2,7 @@ package com.raf.examples.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raf.examples.model.ChildOne;
 import com.raf.examples.model.ChildTwo;
@@ -40,6 +41,7 @@ public class JacksonJsonTest {
         String productAsString = "{\"title\":\"product title\",\"description\":\"product description\",\"price\":10}";
         //WHEN
         Product product = objectMapper.readValue(productAsString, Product.class);
+        JsonNode jsonNode = objectMapper.readTree(productAsString);
         //THEN
         assertEquals("product title", product.getTitle());
         assertEquals("product description", product.getDescription());
@@ -127,5 +129,30 @@ public class JacksonJsonTest {
         assertEquals(parents.get(1).getName(), "name");
         assertEquals(parents.get(1).getDescription(), "description");
         assertEquals(((ChildTwo) parents.get(1)).getChildTwoProperty(), "childTwoProperty");
+    }
+
+    @Test
+    public void testCreateJsonNodeFromJson() throws JsonProcessingException {
+        //GIVEN
+        String content = "{\n" +
+                "   \"firstName\":\"Pera\",\n" +
+                "   \"lastName\":\"Peric\",\n" +
+                "   \"age\":20,\n" +
+                "   \"address\":{\n" +
+                "      \"line1\":\"Apt. 123\",\n" +
+                "      \"line2\":\"321 Main Street\",\n" +
+                "      \"city\":\"New York\"\n" +
+                "   }\n" +
+                "}";
+        //WHEN
+        JsonNode person = objectMapper.readTree(content);
+        //THEN
+        assertEquals("Pera", person.get("firstName").asText());
+        assertEquals("Peric", person.get("lastName").asText());
+        assertEquals(20, person.get("age").asInt());
+        JsonNode address = person.get("address");
+        assertEquals("Apt. 123", address.get("line1").asText());
+        assertEquals("321 Main Street", address.get("line2").asText());
+        assertEquals("New York", address.get("city").asText());
     }
 }
